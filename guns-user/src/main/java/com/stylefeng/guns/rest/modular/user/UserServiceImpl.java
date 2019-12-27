@@ -11,6 +11,8 @@ import com.stylefeng.guns.rest.common.persistence.model.MoocUserT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * @author chm
  * @date 2019/12/25 20:59
@@ -79,13 +81,74 @@ public class UserServiceImpl implements UserAPI {
         }
     }
 
+    /**
+     * MoocUserT实体类与userInfoModel的转换
+     * @param moocUserT
+     * @return
+     */
+    private UserInfoModel do2UserInfo(MoocUserT moocUserT){
+        UserInfoModel userInfoModel = new UserInfoModel();
+
+        userInfoModel.setUuid(moocUserT.getUuid());
+        userInfoModel.setUsername(moocUserT.getUserName());
+        userInfoModel.setUpdateTime(moocUserT.getUpdateTime().getTime());
+        userInfoModel.setSex(moocUserT.getUserSex());
+        userInfoModel.setPhone(moocUserT.getUserPhone());
+        userInfoModel.setNickname(moocUserT.getNickName());
+        userInfoModel.setLifeState(""+moocUserT.getLifeState());
+        userInfoModel.setHeadAddress(moocUserT.getHeadUrl());
+        userInfoModel.setEmail(moocUserT.getEmail());
+        userInfoModel.setBirthday(moocUserT.getBirthday());
+        userInfoModel.setBiography(moocUserT.getBiography());
+        userInfoModel.setBeginTime(moocUserT.getBeginTime().getTime());
+        userInfoModel.setAddress(moocUserT.getAddress());
+
+        return userInfoModel;
+    }
+
     @Override
     public UserInfoModel getUserInfo(int uuid) {
-        return null;
+        // 根据主键查询用户信息[MoocUserT]
+        MoocUserT moocUserT = moocUserTMapper.selectById(uuid);
+        // 将MoocUserT转换UserInfoModel
+        UserInfoModel userInfoModel = do2UserInfo(moocUserT);
+        // 返回UserInfoModel
+        return userInfoModel;
+    }
+
+    private Date time2Date(long time){
+        Date date = new Date(time);
+        return date;
     }
 
     @Override
     public UserInfoModel updateUserInfo(UserInfoModel userInfoModel) {
-        return null;
+        // 将传入的参数转换为DO 【MoocUserT】
+        MoocUserT moocUserT = new MoocUserT();
+
+        moocUserT.setUuid(userInfoModel.getUuid());
+        moocUserT.setNickName(userInfoModel.getNickname());
+        moocUserT.setUserName(userInfoModel.getUsername());
+        moocUserT.setLifeState(Integer.parseInt(userInfoModel.getLifeState()));
+        moocUserT.setBirthday(userInfoModel.getBirthday());
+        moocUserT.setBiography(userInfoModel.getBiography());
+        moocUserT.setBeginTime(null);
+        moocUserT.setHeadUrl(userInfoModel.getHeadAddress());
+        moocUserT.setEmail(userInfoModel.getEmail());
+        moocUserT.setAddress(userInfoModel.getAddress());
+        moocUserT.setUserPhone(userInfoModel.getPhone());
+        moocUserT.setUserSex(userInfoModel.getSex());
+        moocUserT.setUpdateTime(null);
+
+        // DO存入数据库
+        Integer integer = moocUserTMapper.updateById(moocUserT);
+        if(integer>0){
+            // 将数据从数据库中读取出来
+            UserInfoModel userInfo = getUserInfo(moocUserT.getUuid());
+            // 将结果返回给前端
+            return userInfo;
+        }else{
+            return null;
+        }
     }
 }
