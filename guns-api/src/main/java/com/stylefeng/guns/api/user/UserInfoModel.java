@@ -1,11 +1,13 @@
 package com.stylefeng.guns.api.user;
 
+import java.io.Serializable;
+
 /**
  * @author chm
  * 查询的用户信息实体类
  * @date 2019/12/26 15:38
  */
-public class UserInfoModel {
+public class UserInfoModel implements Serializable {
 
     private Integer uuid;
     private String username;
